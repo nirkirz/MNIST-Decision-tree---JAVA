@@ -11,6 +11,7 @@ public class BinTree {
     public List<int[]> examples;
     public int id;
     public IG_Details IG_details;
+    //public int[][] all_means_type_9; //maybe delete
 
     public BinTree(Condition cond, int label, int id){
         this.cond = cond;
@@ -20,6 +21,7 @@ public class BinTree {
         this.left = null;
         this.IG_details = null;
         this.examples = null;
+        //this.all_means_type_9 = null; //maybe delete
     }
 
     public BinTree(){

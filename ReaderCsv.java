@@ -14,13 +14,23 @@ public class ReaderCsv {
         String splitby = ",";
         try {
             BufferedReader br = new BufferedReader(new FileReader(file_name));
+            boolean legal_row;
             while ((line = br.readLine()) != null) {
+                legal_row = true;
                 String[] st = line.split(splitby);
+
                 int[] pic = new int[st.length];
                 for (int i = 0 ; i < st.length ; i++){
-                    pic[i] = Integer.parseInt(st[i]);
+                    try {
+                        pic[i] = Integer.parseInt(st[i]);
+                    }
+                    catch (Exception e){
+                        legal_row = false;
+                        break;
+                    }
                 }
-                pics.add(pic);
+                if (legal_row)
+                    pics.add(pic);
             }
         }
         catch (IOException e) {
