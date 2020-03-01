@@ -5,6 +5,9 @@ import java.util.ArrayList;
 
 public class ReaderCsv {
 
+    /**
+     * Class that used to read from csv file the train and test sets
+     */
     public ReaderCsv(){
     }
 

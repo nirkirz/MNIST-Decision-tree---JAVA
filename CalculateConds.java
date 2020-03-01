@@ -11,6 +11,16 @@ public class CalculateConds extends Thread {
     public BinTree tree;
     public int cond_type;
 
+    /**
+     * Runnable class which its run function finds the best X and L from one group of conditions
+     * @param conds - the conditions group to be checked
+     * @param L - leaf to check
+     * @param local_max_la_examples - examples which the best condtions is true for them
+     * @param local_max_lb_examples - examples which the best condition is false for them
+     * @param local_max_value - the best entropy value from this group of conditions
+     * @param local_max_X - the best condition
+     * @param tree - the tree which the leaf is in
+     */
     public CalculateConds(Condition[] conds, BinTree L, List<int[]> local_max_la_examples, List<int[]>local_max_lb_examples, double local_max_value, Condition local_max_X, BinTree tree){
         this.conds = conds;
         this.L = L;
@@ -23,7 +33,7 @@ public class CalculateConds extends Thread {
     }
 
     public void run(){
-        //System.out.println("Started thread " + cond_type + "...");
+        // Calculate entropy for each condition by the formula
         for (Condition X : conds){
             List<int[]> la = new ArrayList<>();
             List<int[]> lb = new ArrayList<>();
@@ -46,6 +56,7 @@ public class CalculateConds extends Thread {
                 h_l = tree.H(L.examples);
                 IG_X_L = h_l - h_x;
             }
+            // if this condition is better the all the previous conditions than updates max values
             if (local_max_value < IG_X_L * n){
                 local_max_value = IG_X_L * n;
                 local_max_X = X;
@@ -53,6 +64,7 @@ public class CalculateConds extends Thread {
                 local_max_lb_examples = lb;
             }
         }
+        // Update the value that the leaf will hold - the best X and L
         synchronized (this){
             if (L.IG_details == null)
                 L.IG_details = new IG_Details(local_max_value, local_max_X, local_max_la_examples, local_max_lb_examples);
@@ -61,6 +73,5 @@ public class CalculateConds extends Thread {
                     L.IG_details = new IG_Details(local_max_value, local_max_X, local_max_la_examples, local_max_lb_examples);
             }
         }
-        //System.out.println("Finished thread " + cond_type + "...");
     }
 }

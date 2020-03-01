@@ -34,14 +34,26 @@ public class BinTree {
         this.examples = null;
     }
 
+    /**
+     * Function return true if this tree is a leaf with no children
+     * @return
+     */
     public boolean isLeaf(){
         return ((this.right == null) && (this.left == null));
     }
 
+    /**
+     * this functions defines equalization between 2 trees
+     * @return
+     */
     public boolean equals(BinTree other){
         return this.id == other.id;
     }
 
+    /**
+     * Calculate H value by the formula
+     * @return
+     */
     public double H(List<int[]> leaf_ex){
         int [] Ni = new int [10];
         for(int [] ex : leaf_ex){
@@ -60,6 +72,10 @@ public class BinTree {
         return h_value;
     }
 
+    /**
+     * find common label among the parameter train_set
+     * @return
+     */
     public int common_label(List<int[]> train_set){
         int [] digit_count = new int [10];
 
@@ -81,7 +97,12 @@ public class BinTree {
         return max_i;
     }
 
-    //CHECK IF WE NEED TO ADD BOUND_PICS!!!
+    /**
+     * Function gets tree and img, simulate the tree conditions on image and return its predicted label
+     * @param tree
+     * @param img
+     * @return
+     */
     public int getLabelByTree(BinTree tree, int[] img){
         while(! tree.isLeaf()){
             if (tree.cond.CheckCondition(img)){
@@ -94,6 +115,9 @@ public class BinTree {
         return tree.label;
     }
 
+    /**
+     * Function clean the tree from examples to make it exportable to json
+     */
     public void clean(){
         this.examples = new ArrayList<>();
         this.IG_details = null;
