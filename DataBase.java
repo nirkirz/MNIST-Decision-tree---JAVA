@@ -14,6 +14,12 @@ public class DataBase {
     public int[][] better_means;
     public int[][] means_histogram;
 
+    /**
+     * Class that is a singletone datebase that keeps all calculations and help-calculations
+     * so its prevent duplicate calculations
+     * @param b - bounderies pictures
+     * @param s - sharped pictures
+     */
     public DataBase(List<int[]> b, List<int[]> s){
         bounds = b;
         sharps = s;
@@ -28,12 +34,21 @@ public class DataBase {
         instance = this;
     }
 
+    /**
+     * return single instance of the database
+     * @return
+     */
     public static DataBase getInstance(){
         return instance;
     }
 
+    /**
+     * Function creates by each img in train_set the average image for each existing label
+     * The function also sharpening the output image using histogram and cdf function.
+     * @param train_set
+     */
     public void CreateMeanImages(List<int[]> train_set){
-        System.out.println("Create means start");
+        // ---- Create average image ----
         int[][] result = new int[10][785];
         int[][] result_histo = new int[10][];
         int[][] result_better_means = new int[10][785];
@@ -47,12 +62,16 @@ public class DataBase {
             for (int j = 1 ; j < 785 ; j++)
                 result[i][j] = result[i][j]/counters[i];
         this.means = result;
+        // ---- Create average image ----
 
+        // ---- Calculate histogram of each image ----
         for (int i = 0; i < 10; i++){
             result_histo[i] = CalculateHistogram(result[i]);
         }
         this.means_histogram = result_histo;
+        // ---- Calculate histogram of each image ----
 
+        // ---- Find max and min values in the average image ----
         for (int i = 0; i < 10; i++){
             int min = 0;
             int max = 256;
@@ -69,13 +88,17 @@ public class DataBase {
                     break;
                 }
             }
+            // ---- Find max and min values in the average image ----
 
+            // ---- Calculate cdf function ----
             int[] cdf = new int[256];
             cdf[min] = means_histogram[i][min];
             for (int j = min+1 ; j < 256; j++){
                 cdf[j] = cdf[j-1] + means_histogram[i][j];
             }
+            // ---- Calculate cdf function ----
 
+            // ---- Calculate new value of each pixel in average image ----
             int[] better_img = new int[785];
             int[] new_pixel_values = new int[256];
             for (int j = min; j <= max; j++){
@@ -91,15 +114,13 @@ public class DataBase {
             result_better_means[i] = better_img;
         }
         this.better_means = result_better_means;
-
-        //Maybe delete
-//        if (this.real_means == null)
-//            this.better_means = result_better_means;
-//        else
-//            this.better_means = real_means;
-        System.out.println("Create means end");
+        // ---- Calculate new value of each pixel in average image ----
     }
 
+    /**
+     * Calculate all required data for checking Conditions of type 6 on pics
+     * @param pics
+     */
     public void CreateType6Data(List<int[]> pics){
         int counter = 0;
         for (int[] img : pics){
@@ -119,6 +140,10 @@ public class DataBase {
         }
     }
 
+    /**
+     * Calculate all required data for checking Conditions of type 7 on pics
+     * @param pics
+     */
     public void CreateType7Data(List<int[]> pics){
         int counter = 0;
         for (int[] img : pics){
@@ -149,6 +174,10 @@ public class DataBase {
         }
     }
 
+    /**
+     * Calculate all required data for checking Conditions of type 8 on pics
+     * @param pics
+     */
     public void CreateType8Data(List<int[]> pics){
         int counter = 0;
         for (int [] img : pics){
@@ -166,6 +195,10 @@ public class DataBase {
         }
     }
 
+    /**
+     * Calculate all required data for checking Conditions of type 9 on pics
+     * @param pics
+     */
     public void CreateType9Data(List<int[]> pics){
         int counter = 0;
         int place = 0;
@@ -205,6 +238,15 @@ public class DataBase {
         }
     }
 
+    /**
+     * Function used by Conditions of type 6 to check if (row, col) in image is min or max
+     * in row/col
+     * @param img
+     * @param row
+     * @param col
+     * @param type
+     * @return
+     */
     public boolean check_min_max(int [] img, int row, int col, int type){
         boolean is_row = false;
         boolean is_max = false;
@@ -257,6 +299,15 @@ public class DataBase {
         }
     }
 
+    /**
+     * Function used by Conditions of type 7 to check if there are lines on img
+     * in specific block and of minimum length
+     * @param img
+     * @param is_hori
+     * @param len
+     * @param block
+     * @return
+     */
     public boolean find_lines(int[] img, int is_hori, int len, int block){
         int ind = img[785];
         int[] bound = this.bounds.get(ind);
@@ -299,6 +350,13 @@ public class DataBase {
 
     }
 
+    /**
+     * Function used by Conditions of type 8 to check if there are holes
+     * in specific block (specified by center) on image
+     * @param img
+     * @param center
+     * @return
+     */
     public boolean check_holes(int[] img, int center){
         int index = img[785];
         int[] sharp = sharps.get(index);
@@ -345,6 +403,12 @@ public class DataBase {
             return isHole(loc, sharp);
     }
 
+    /**
+     * Function checks 8 directions which indicates if loc is part of a hole in img
+     * @param loc
+     * @param img
+     * @return
+     */
     public boolean isHole(int loc, int[] img){
         int[][] img_2d = new int[28][28];
         for (int i = 0 ; i < 28 ; i++){
@@ -478,6 +542,11 @@ public class DataBase {
         return total_flag;
     }
 
+    /**
+     * Functions calculates historgam of values in img
+     * @param img
+     * @return
+     */
     public int[] CalculateHistogram(int[] img){
         int[] data = new int [256];
         for (int i = 1; i < 785; i++){

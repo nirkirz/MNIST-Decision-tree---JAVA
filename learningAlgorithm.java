@@ -9,7 +9,6 @@ import java.io.IOException;
 public class learningAlgorithm {
 
     public List<BinTree> BuildDecisionTree(double t, List<int[]> train_set, Condition[] conds, BinTree tree, List<BinTree> leaves, int id_leaf, double last_t, Condition[][] condsv2){
-        System.out.println("starting t = " + t);
         for (double i=last_t; i< t; i++){
             // ---- Variables to save optimal X and L ----
             double max_value = 0;
@@ -18,9 +17,11 @@ public class learningAlgorithm {
             List<int[]> max_la_examples = new ArrayList<>();
             List<int[]> max_lb_examples = new ArrayList<>();
             // ---- End Initial Variables ----
+
+            // ---- Find Optimal Leaf to split ----
             int index_threads;
             for (BinTree L : leaves){
-                CalculateConds[] threadsv2 = new CalculateConds[8];
+                CalculateConds[] threadsv2 = new CalculateConds[condsv2.length];
                 index_threads = 0;
                 // ---- Find Optimal X for each leaf
                 double local_max_value = -1;
@@ -74,6 +75,12 @@ public class learningAlgorithm {
         return leaves;
     }
 
+
+    /**
+     * Build conditions group of type 1
+     * Check if cell is more than 128
+     * @return
+     */
     public Condition[] BuildType1(){
         Condition[] conds = new Condition [784];
         for (int i = 1 ; i < 785; i++){
@@ -85,6 +92,12 @@ public class learningAlgorithm {
         return conds;
     }
 
+
+    /**
+     * Build conditions group of type 2
+     * Check for block of size 3*3 if there is more than 3 cell which its value >= 128
+     * @return
+     */
     public Condition[] BuildType2(){
         Condition[] conds = new Condition[81];
         int cond_count = 0;
@@ -104,6 +117,12 @@ public class learningAlgorithm {
         return conds;
     }
 
+
+    /**
+     * Build conditions group of type 3
+     * Check for block of size 3*3 if there is more than 1 cell which its value >= 128
+     * @return
+     */
     public Condition[] BuildType3(){
         Condition[] conds = new Condition[81];
         int cond_count = 0;
@@ -123,6 +142,12 @@ public class learningAlgorithm {
         return conds;
     }
 
+
+    /**
+     * Build conditions group of type 4
+     * Check for block of size 4*4 if there is more than 7 cells which its value >= 128
+     * @return
+     */
     public Condition[] BuildType4(){
         Condition[] conds = new Condition[49];
         int cond_count = 0;
@@ -142,6 +167,12 @@ public class learningAlgorithm {
         return conds;
     }
 
+
+    /**
+     * Build conditions group of type 5
+     * Check for block of size 4*4 if there is more than 5 cells which its value >= 128
+     * @return
+     */
     public Condition[] BuildType5(){
         Condition[] conds = new Condition[49];
         int cond_count = 0;
@@ -161,6 +192,12 @@ public class learningAlgorithm {
         return conds;
     }
 
+
+    /**
+     * Build conditions group of type 4
+     * Check if specific block of size 4*4 is max/min in row/col
+     * @return
+     */
     public Condition[] BuildType6(){
         Condition[] conds = new Condition[196];
         int conds_counter = 0;
@@ -176,6 +213,12 @@ public class learningAlgorithm {
         return conds;
     }
 
+
+    /**
+     * Build conditions group of type 7
+     * Checks for block if it contains straight lines
+     * @return
+     */
     public Condition[] BuildType7(){
         Condition[] conds = new Condition[88];
         int counter = 0;
@@ -194,6 +237,12 @@ public class learningAlgorithm {
         return conds;
     }
 
+
+    /**
+     * Build conditions group of type 8
+     * Checks if a block contains a cell which is part of a hole on an img
+     * @return
+     */
     public Condition[] BuildType8(){
         Condition[] conds = new Condition[81];
         int counter = 0;
@@ -209,6 +258,11 @@ public class learningAlgorithm {
         return conds;
     }
 
+    /**
+     * Build conditions group of type 9
+     * Checks percent of similarity between image and one of the average images
+     * @return
+     */
     public Condition[] BuildType9(){
         Condition[] conds = new Condition[10];
         for (int i = 0; i < 10; i++){
@@ -219,16 +273,24 @@ public class learningAlgorithm {
     }
 
     public static void main(String[] args){
-        int version = 2;
-        double p = 20;
-        double l = 8;
-        //String train_set_file_name = "C:\\Users\\yuval\\IdeaProjects\\mini_mnist\\mnist_train.csv";
-        //String output_tree_file_name = "C:\\Users\\yuval\\IdeaProjects\\mini_mnist\\out_tree.json";
-        String train_set_file_name = "C:\\Users\\yuval\\IdeaProjects\\mini_mnist\\Kannada\\train.csv";
-        String output_tree_file_name = "C:\\Users\\yuval\\IdeaProjects\\mini_mnist\\out_tree.json";
+//        int version = 1;
+//        double p = 20;
+//        double l = 8;
+//        int version = Integer.parseInt(args[0]);
+        int version = Integer.parseInt(args[0]);
+        double p = Double.parseDouble(args[1]);
+        double l = Double.parseDouble(args[2]);
+        String train_set_file_name = args[3];
+        String output_tree_file_name = args[4];
+//        String train_set_file_name = "/users/studs/bsc/2019/nirkirz/mini-project/mnist_train.csv";
+
+        //String train_set_file_name = "C:\\Users\\yuval\\IdeaProjects\\mini_mnist\\Kannada\\train.csv";
+//        String output_tree_file_name = "users\\studs\\bsc\\2019\\nirkirz\\mini-project\\out_tree.json";
+//        String output_tree_file_name = "/users/studs/bsc/2019/nirkirz/mini-project/out_tree.json";
         ReaderCsv reader = new ReaderCsv();
         ArrayList<int[]> pics1 = reader.getCSVArray(train_set_file_name);
 
+        // Init all variables
         Collections.shuffle(pics1);
         double div = p/100;
         double valid_set1 = (div)*pics1.size();
@@ -238,13 +300,20 @@ public class learningAlgorithm {
         List<int[]> pics;
         DataBase db = null;
         Condition[] conds;
-        Condition[][] condsver2 = new Condition[8][];
+        Condition[][] condsver2;
+
+        // if version 1 only conds1 are to be checked, db is empty
         if (version == 1){
+            condsver2 = new Condition[1][];
             conds = new learningAlgorithm().BuildType1();
+            condsver2[0] = conds;
             pics = pics1;
+            db = new DataBase(new ArrayList<int[]>(),new ArrayList<int[]>());
+            db.better_means = new int[0][];
         }
         else
         {
+            condsver2 = new Condition[8][];
             pics = new ArrayList<>();
             int counter = 0;
             for (int[] img : pics1){
@@ -257,17 +326,17 @@ public class learningAlgorithm {
                 counter++;
             }
 
+            // Create sharped and bounderies images for all images
             sharpImages = new learningAlgorithm().SharpImage(pics1);
-            System.out.println("Finish Sharps");
             bounderies = new learningAlgorithm().BoundImage(sharpImages);
-            System.out.println("Finish Bounds");
 
+            // Fill DataBase values and calculations
             db = new DataBase(bounderies, sharpImages);
-
             db.CreateType6Data(pics1);
             db.CreateType7Data(pics);
             db.CreateType8Data(pics);
 
+            // Create all condition groups
             Condition[] conds1 = new learningAlgorithm().BuildType1();
             Condition[] conds2 = new learningAlgorithm().BuildType2();
             Condition[] conds3 = new learningAlgorithm().BuildType3();
@@ -278,6 +347,7 @@ public class learningAlgorithm {
             Condition[] conds8 = new learningAlgorithm().BuildType8();
             Condition[] conds9 = new learningAlgorithm().BuildType9();
 
+            // Merge all condition to one 2D array
             conds = new Condition[conds1.length + conds2.length + conds3.length + conds4.length + conds5.length + conds6.length + conds7.length + conds8.length + conds9.length];
             condsver2[0] = conds7;
             condsver2[1] = conds2;
@@ -287,52 +357,19 @@ public class learningAlgorithm {
             condsver2[5] = conds6;
             condsver2[6] = conds8;
             condsver2[7] = conds9;
-            //condsver2[8] = conds1;
-
        }
 
+        // Create 2 new Lists - train set and validation set
         List<int[]> valid_set = pics.subList(0, valid_set_size);
         List<int[]> train_set = pics.subList(valid_set_size, pics.size());
 
+        // Do calculation that relevant only for condition in version 2
         if(version == 2) {
             db.CreateMeanImages(train_set);
             db.CreateType9Data(pics);
         }
 
-//        for (int w = 1 ; w < 10 ; w++) {
-//            System.out.println("Label: " + w);
-//
-//            System.out.println("mean bad");
-//            System.out.print("[");
-//            for (int f1 = 0; f1 < 784; f1++) {
-//                System.out.print(db.means[w][f1] + ",");
-//            }
-//            System.out.println("");
-//            System.out.println("means good");
-//            System.out.print("[");
-//            for (int f1 = 0; f1 < 784; f1++) {
-//                System.out.print(db.better_means[w][f1] + ",");
-//            }
-//            System.out.println("");
-//            System.out.println("histogram");
-//            System.out.print("[");
-//            for (int f1 = 0; f1 < 256; f1++) {
-//                System.out.print(db.means_histogram[w][f1] + ",");
-//            }
-//            System.out.println("");
-//        }
-
-
-        //DELETE WHEN SUBMITION!!!
-        for (int i = 0 ; i < 10 ; i ++){
-            System.out.print("[");
-            for (int j = 1; j < 785; j++){
-                System.out.print(db.better_means[i][j] + ",");
-            }
-            System.out.println("]");
-        }
-
-
+        // ---- START BUILD THE TREE ----
         int id_leaf = 1;
         // ---- Build First Leaf ----
         int max_digit = new BinTree().common_label(train_set);
@@ -344,10 +381,10 @@ public class learningAlgorithm {
         double last_t = 0;
         List<BinTree> leaves = new ArrayList<>();
         leaves.add(tree);
-        int max_l = -1;
+        int max_l = 0;
         int max_value = 0;
         double t = 0;
-        for (int i = 0; i < l+1 ; i++){
+        for (int i = 0; i < l+1 ; i++){     //each iteration build tree of different size based on previous tree
             t = Math.pow(2, i);
             List<BinTree> res_build = new learningAlgorithm().BuildDecisionTree(t, train_set, conds,  tree,  leaves,  id_leaf,  last_t, condsver2);
             tree = res_build.remove(1);
@@ -368,7 +405,6 @@ public class learningAlgorithm {
             }
         }
         // ---- Build Final Tree ----
-        System.out.println("Build final tree");
         id_leaf = 1;
         max_digit = tree.common_label(pics);
         tree = new BinTree(null, max_digit, id_leaf);
@@ -382,15 +418,11 @@ public class learningAlgorithm {
         BinTree final_tree = res_final.remove(1);
         final_tree.clean();
 
-        //Maybe Delete!!!
-//        BinTree mean_node = new BinTree(conds[0],0,22222222);
-//        mean_node.all_means_type_9 = db.better_means;
-//        mean_node.right = final_tree;
 
+        // Export files needed to prediction
         Gson gson = new Gson();
         try {
             FileWriter writer = new FileWriter(output_tree_file_name);
-            //gson.toJson(final_tree, writer);
             ToPrediction to_pred = new ToPrediction(final_tree, db.better_means);
             gson.toJson(to_pred, writer);
             writer.flush();
@@ -406,13 +438,18 @@ public class learningAlgorithm {
             if (predicted != img[0])
                 errors++;
         }
+        int num_to_print = (int)(p/100*pics.size());
+        System.out.println("num: " + num_to_print);
         System.out.println("error: " + errors);
-        System.out.println("size: " + final_t);
-
-
-
+        System.out.println("size: " + (int)final_t);
     }
 
+    /**
+     * Function calculate for each picture the sharped image
+     * if value is more that 64 it becomes 255, else becomes 0
+     * @param pics
+     * @return
+     */
     public List<int[]> SharpImage(List<int[]> pics){
         List <int[]> result = new ArrayList<>();
         int counter = 0;
@@ -431,6 +468,11 @@ public class learningAlgorithm {
         return result;
     }
 
+    /**
+     * Based on sharped images, calculate maximum gradient value and create bounderies image
+     * @param sharp_pics
+     * @return
+     */
     public List<int[]> BoundImage(List<int[]> sharp_pics) {
         List <int[]> result = new ArrayList<>();
         int counter = 0;

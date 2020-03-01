@@ -1,10 +1,13 @@
-import javax.xml.crypto.Data;
-
 public class Condition {
 
     public int[] cond_details;
     public int cond_type;
 
+    /**
+     * Class which saves all required information of specific cond to check on an img
+     * @param cond_details
+     * @param cond_type
+     */
     public Condition(int[] cond_details, int cond_type) {
         this.cond_details = cond_details;
         this.cond_type = cond_type;
@@ -15,7 +18,11 @@ public class Condition {
         this.cond_type = 0;
     }
 
-    //CHECK IF WE NEED BOUND_PICS
+    /**
+     * check if this Condition is true or flase on input img
+     * @param img
+     * @return
+     */
     public boolean CheckCondition(int[] img) {
         if (this.cond_type == 1) {
             int img_index = this.cond_details[0];
